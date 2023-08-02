@@ -1,29 +1,29 @@
 class Solution:
-    def get_mid(self, arr):
-        is_odd = bool(len(arr) % 2 != 0)
-        if is_odd:
-            return arr[len(arr)//2]
-        else:
-            return (arr[len(arr)//2] + arr[len(arr)//2 - 1]) / 2
     def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> float:        
-        if not nums1:
-            return self.get_mid(nums2)
-        elif not nums2:
-            return self.get_mid(nums1)
-        tol_len = len(nums1) + len(nums2)
-        mid_idx = tol_len // 2 if tol_len % 2 == 0 else tol_len // 2 + 1
-        merged_nums = []
-        while len(merged_nums) < mid_idx + 1:
-            if nums1 and nums2:
-                if nums1[-1] >= nums2[-1]:
-                    merged_nums.append(nums1.pop())
+        if len(nums1) > len(nums2):
+            nums1, nums2 = nums2, nums1
+
+        m, n = len(nums1), len(nums2)
+        low, high = 0, m
+        total_length = m + n
+        half_length = (total_length + 1) // 2
+
+        while low <= high:
+            partition_nums1 = (low + high) // 2
+            partition_nums2 = half_length - partition_nums1
+
+            max_left_nums1 = float('-inf') if partition_nums1 == 0 else nums1[partition_nums1 - 1]
+            min_right_nums1 = float('inf') if partition_nums1 == m else nums1[partition_nums1]
+
+            max_left_nums2 = float('-inf') if partition_nums2 == 0 else nums2[partition_nums2 - 1]
+            min_right_nums2 = float('inf') if partition_nums2 == n else nums2[partition_nums2]
+
+            if max_left_nums1 <= min_right_nums2 and max_left_nums2 <= min_right_nums1:
+                if total_length % 2 == 0:
+                    return (max(max_left_nums1, max_left_nums2) + min(min_right_nums1, min_right_nums2)) / 2.0
                 else:
-                    merged_nums.append(nums2.pop())
-            elif nums1:
-                merged_nums.append(nums1.pop())
-            elif nums2:
-                merged_nums.append(nums2.pop())
-        if tol_len % 2 != 0:
-            return merged_nums[-2]
-        else:
-            return (merged_nums[-1] + merged_nums[-2])/2
+                    return float(max(max_left_nums1, max_left_nums2))
+            elif max_left_nums1 > min_right_nums2:
+                high = partition_nums1 - 1
+            else:
+                low = partition_nums1 + 1
